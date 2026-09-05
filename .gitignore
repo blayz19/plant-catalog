@@ -1,0 +1,31 @@
+# Зависимости
+node_modules/
+package-lock.json
+yarn.lock
+
+# Базы данных (если SQLite)
+*.db
+*.db-journal
+
+# Файлы окружения
+.env
+.env.local
+.env.production
+
+# Сборки
+dist/
+build/
+.vercel/
+.out/
+
+# Логи
+*.log
+npm-debug.log*
+
+# Системные файлы
+.DS_Store
+Thumbs.db
+
+# Временные файлы
+*.tmp
+.cache/
