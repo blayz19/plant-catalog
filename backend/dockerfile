@@ -1,21 +1,19 @@
 FROM node:18-alpine
 
+# Устанавливаем OpenSSL
+RUN apk add --no-cache openssl
+
 WORKDIR /app
 
-# Копируем package.json и package-lock.json
-COPY package*.json ./
-
-# Устанавливаем зависимости
+COPY backend/package*.json ./backend/
+WORKDIR /app/backend
 RUN npm install
 
-# Копируем весь код
-COPY . .
+COPY backend/ ./
 
 # Генерируем Prisma клиент
 RUN npx prisma generate
 
-# Открываем порт
-EXPOSE 5000
+EXPOSE 8080
 
-# Запускаем сервер
 CMD ["npm", "run", "start"]
