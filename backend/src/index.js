@@ -3,6 +3,10 @@ import cors from "cors";
 import dotenv from "dotenv";
 import path from "path";
 import { fileURLToPath } from "url";
+import { PrismaClient } from "@prisma/client";
+import bcrypt from "bcryptjs";
+import { exec } from "child_process";
+import util from "util";
 import authRoutes from "./routes/auth.js";
 import categoryRoutes from "./routes/categories.js";
 import productRoutes from "./routes/products.js";
@@ -11,7 +15,8 @@ import pageRoutes from "./routes/pages.js";
 import newsRoutes from "./routes/news.js";
 import uploadRoutes from "./routes/upload.js";
 import { authenticateToken } from "./middleware/auth.js";
-import { PrismaClient } from "@prisma/client";
+
+const execPromise = util.promisify(exec);
 
 dotenv.config();
 
@@ -22,6 +27,65 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 const prisma = new PrismaClient();
+
+// ⭐ СОЗДАЁМ АДМИНА, ЕСЛИ ЕГО НЕТ
+async function seedAdmin() {
+  try {
+    const adminEmail = "admin@admin.com";
+    const existingAdmin = await prisma.user.findUnique({
+      where: { email: adminEmail },
+    });
+
+    if (!existingAdmin) {
+      const hashedPassword = await bcrypt.hash("admin123", 10);
+      await prisma.user.create({
+        data: {
+          email: adminEmail,
+          password: hashedPassword,
+        },
+      });
+      console.log("✅ Админ создан: admin@admin.com / admin123");
+    } else {
+      console.log("✅ Админ уже существует");
+    }
+  } catch (error) {
+    console.error("❌ Ошибка создания админа:", error.message);
+  }
+}
+
+// ⭐ ИНИЦИАЛИЗАЦИЯ БАЗЫ ДАННЫХ
+async function initDB() {
+  try {
+    await prisma.$connect();
+    console.log("✅ База данных подключена");
+
+    // Проверяем, есть ли таблицы
+    await prisma.user.count();
+    console.log("✅ Таблицы существуют");
+
+    // Создаём админа
+    await seedAdmin();
+  } catch (error) {
+    if (error.code === "P2021") {
+      console.log("⚠️ Таблицы не найдены, создаём...");
+      try {
+        const { stdout, stderr } = await execPromise("npx prisma db push");
+        if (stderr) console.log("⚠️", stderr);
+        console.log("✅ Таблицы созданы!");
+
+        // После создания таблиц — создаём админа
+        await seedAdmin();
+      } catch (err) {
+        console.error("❌ Ошибка создания таблиц:", err.message);
+      }
+    } else {
+      console.error("❌ Ошибка подключения к БД:", error.message);
+    }
+  }
+}
+
+// Запускаем инициализацию
+initDB();
 
 // Middleware
 app.use(cors());
@@ -46,31 +110,3 @@ app.get("/api/health", (req, res) => {
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
 });
-
-async function initDB() {
-  try {
-    await prisma.$connect();
-    console.log("✅ База данных подключена");
-
-    // Проверяем, есть ли таблицы
-    await prisma.user.count();
-    console.log("✅ Таблицы существуют");
-  } catch (error) {
-    if (error.code === "P2021") {
-      console.log("⚠️ Таблицы не найдены, создаём...");
-      // Выполняем миграцию через exec
-      const { exec } = await import("child_process");
-      exec("npx prisma db push", (err, stdout) => {
-        if (err) {
-          console.error("❌ Ошибка создания таблиц:", err);
-        } else {
-          console.log("✅ Таблицы созданы!");
-        }
-      });
-    } else {
-      console.error("❌ Ошибка подключения к БД:", error.message);
-    }
-  }
-}
-
-initDB();
