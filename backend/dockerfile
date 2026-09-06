@@ -1,23 +1,21 @@
-# Используем официальный образ Node.js
 FROM node:18-alpine
 
-# Устанавливаем рабочую директорию внутри контейнера
 WORKDIR /app
 
-# Копируем файлы package.json и package-lock.json (если есть)
+# Копируем package.json и package-lock.json
 COPY package*.json ./
 
 # Устанавливаем зависимости
-RUN npm ci --only=production
+RUN npm install
 
-# Устанавливаем Prisma отдельно (если используешь)
-RUN npx prisma generate
-
-# Копируем весь остальной код
+# Копируем весь код
 COPY . .
 
-# Открываем порт, который слушает приложение
+# Генерируем Prisma клиент
+RUN npx prisma generate
+
+# Открываем порт
 EXPOSE 5000
 
-# Команда для запуска сервера
+# Запускаем сервер
 CMD ["npm", "run", "start"]
