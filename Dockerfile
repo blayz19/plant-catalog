@@ -11,10 +11,9 @@ RUN npm install
 
 COPY backend/ ./
 
-# ⭐ ГЕНЕРИРУЕМ КЛИЕНТ И СОЗДАЁМ ТАБЛИЦЫ
+# Генерируем Prisma клиент
 RUN npx prisma generate
-RUN npx prisma db push
 
-EXPOSE 5000
+EXPOSE 8080
 
 CMD ["npm", "run", "start"]
