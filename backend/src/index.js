@@ -53,6 +53,17 @@ async function seedAdmin() {
   }
 }
 
+// ⭐ ЗАПОЛНЯЕМ ТЕСТОВЫМИ ДАННЫМИ
+async function seedTestData() {
+  try {
+    const { stdout, stderr } = await execPromise("node prisma/seed-test.cjs");
+    if (stderr) console.log("⚠️", stderr);
+    console.log("✅ Тестовые данные загружены!");
+  } catch (error) {
+    console.error("❌ Ошибка заполнения тестовыми данными:", error.message);
+  }
+}
+
 // ⭐ ИНИЦИАЛИЗАЦИЯ БАЗЫ ДАННЫХ
 async function initDB() {
   try {
@@ -65,6 +76,15 @@ async function initDB() {
 
     // Создаём админа
     await seedAdmin();
+
+    // Проверяем, есть ли товары, если нет — заполняем тестовыми
+    const productsCount = await prisma.product.count();
+    if (productsCount === 0) {
+      console.log("📦 Товаров нет, заполняем тестовыми данными...");
+      await seedTestData();
+    } else {
+      console.log(`📦 В базе уже есть ${productsCount} товаров`);
+    }
   } catch (error) {
     if (error.code === "P2021") {
       console.log("⚠️ Таблицы не найдены, создаём...");
@@ -75,6 +95,10 @@ async function initDB() {
 
         // После создания таблиц — создаём админа
         await seedAdmin();
+
+        // И заполняем тестовыми данными
+        console.log("📦 Заполняем тестовыми данными...");
+        await seedTestData();
       } catch (err) {
         console.error("❌ Ошибка создания таблиц:", err.message);
       }
@@ -101,6 +125,23 @@ app.use("/api/banners", bannerRoutes);
 app.use("/api/pages", pageRoutes);
 app.use("/api/news", newsRoutes);
 app.use("/api/upload", authenticateToken, uploadRoutes);
+
+// ⭐ ЭНДПОИНТ ДЛЯ РУЧНОГО ЗАПУСКА ТЕСТОВЫХ ДАННЫХ
+app.post("/api/seed-test", async (req, res) => {
+  try {
+    const { stdout, stderr } = await execPromise("node prisma/seed-test.cjs");
+    if (stderr) console.log("⚠️", stderr);
+    res.json({
+      message: "✅ Тестовые данные успешно созданы!",
+      output: stdout,
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: "❌ Ошибка создания тестовых данных",
+      details: error.message,
+    });
+  }
+});
 
 // Health check
 app.get("/api/health", (req, res) => {
