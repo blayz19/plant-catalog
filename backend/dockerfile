@@ -1,6 +1,5 @@
 FROM node:18-alpine
 
-# Устанавливаем OpenSSL
 RUN apk add --no-cache openssl
 
 WORKDIR /app
@@ -11,8 +10,9 @@ RUN npm install
 
 COPY backend/ ./
 
-# Генерируем Prisma клиент
+# ⭐ СОЗДАЁМ ТАБЛИЦЫ
 RUN npx prisma generate
+RUN npx prisma db push
 
 EXPOSE 8080
 
