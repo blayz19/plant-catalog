@@ -648,29 +648,21 @@ async function initDB() {
     await prisma.$connect();
     console.log("✅ База данных подключена");
 
-    // Проверяем, есть ли таблицы
-    await prisma.user.count();
-    console.log("✅ Таблицы существуют");
+    // ⭐ ПРИНУДИТЕЛЬНО СОЗДАЁМ ТАБЛИЦЫ
+    console.log("📦 Проверяем и создаём таблицы...");
+    const { stdout, stderr } = await execPromise(
+      "npx prisma db push --skip-generate",
+    );
+    if (stderr) console.log("⚠️", stderr);
+    console.log("✅ Таблицы созданы/обновлены");
+
+    const userCount = await prisma.user.count();
+    console.log(`📊 В базе: ${userCount} пользователей`);
 
     await seedAdmin();
     await seedCategories();
   } catch (error) {
-    if (error.code === "P2021") {
-      console.log("⚠️ Таблицы не найдены, создаём...");
-      try {
-        const { stdout, stderr } = await execPromise("npx prisma db push");
-        if (stderr) console.log("⚠️", stderr);
-        console.log("✅ Таблицы созданы!");
-
-        // После создания таблиц
-        await seedAdmin();
-        await seedCategories();
-      } catch (err) {
-        console.error("❌ Ошибка создания таблиц:", err.message);
-      }
-    } else {
-      console.error("❌ Ошибка подключения к БД:", error.message);
-    }
+    console.error("❌ Ошибка инициализации БД:", error.message);
   }
 }
 
