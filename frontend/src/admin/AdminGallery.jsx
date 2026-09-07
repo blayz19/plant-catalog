@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import API from '../api/config';
+import { getImageUrl } from '../api/config';
 
 export default function AdminGallery() {
   const [photos, setPhotos] = useState([]);
@@ -179,14 +180,14 @@ export default function AdminGallery() {
               {photosByYear[year].map((photo) => (
                 <div key={photo.id} className="group relative bg-white rounded-lg shadow-md overflow-hidden">
                   <img
-                    src={`http://localhost:5001${photo.imageUrl}`}
-                    alt={photo.title}
-                    className="w-full h-40 object-cover"
-                    onError={(e) => {
-                      e.target.src = '';
-                      e.target.alt = '❌';
-                    }}
-                  />
+  src={getImageUrl(photo.imageUrl)}
+  alt={photo.title}
+  className="w-full h-40 object-cover"
+  onError={(e) => {
+    e.target.src = '';
+    e.target.alt = '❌';
+  }}
+/>
                   <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
                     <button
                       onClick={() => handleDelete(photo.id)}

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import API from '../api/config';
+import API, { getImageUrl } from '../api/config';
 
 export default function Gallery() {
   const [photosByYear, setPhotosByYear] = useState({});
@@ -38,11 +38,6 @@ export default function Gallery() {
     fetchPhotos();
   }, [selectedYear]);
 
-  const getImageUrl = (path) => {
-    if (!path) return '';
-    if (path.startsWith('http')) return path;
-    return `http://localhost:5001${path}`;
-  };
 
   if (loading) {
     return (
@@ -92,14 +87,14 @@ export default function Gallery() {
               className="group relative overflow-hidden rounded-2xl shadow-lg bg-gray-100 aspect-square"
             >
               <img
-                src={getImageUrl(photo.imageUrl)}
-                alt={photo.title}
-                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                onError={(e) => {
-                  e.target.src = '';
-                  e.target.alt = 'Фото недоступно';
-                }}
-              />
+  src={getImageUrl(photo.imageUrl)}  // ← ИСПОЛЬЗУЕМ getImageUrl
+  alt={photo.title}
+  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+  onError={(e) => {
+    e.target.src = '';
+    e.target.alt = 'Фото недоступно';
+  }}
+/>
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
                 <div>
                   <p className="text-white font-medium">{photo.title}</p>
