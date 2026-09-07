@@ -642,6 +642,7 @@ async function seedCategories() {
 }
 
 // 3. Инициализация БД
+// ⭐ ИНИЦИАЛИЗАЦИЯ БАЗЫ ДАННЫХ
 async function initDB() {
   try {
     await prisma.$connect();
@@ -651,10 +652,7 @@ async function initDB() {
     await prisma.user.count();
     console.log("✅ Таблицы существуют");
 
-    // Создаём админа
     await seedAdmin();
-
-    // Создаём категории
     await seedCategories();
   } catch (error) {
     if (error.code === "P2021") {
