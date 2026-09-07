@@ -16,6 +16,9 @@ import newsRoutes from "./routes/news.js";
 import uploadRoutes from "./routes/upload.js";
 import { authenticateToken } from "./middleware/auth.js";
 
+import pageContentRoutes from "./routes/pageContent.js";
+import galleryRoutes from "./routes/gallery.js";
+
 const execPromise = util.promisify(exec);
 
 dotenv.config();
@@ -125,6 +128,8 @@ app.use("/api/banners", bannerRoutes);
 app.use("/api/pages", pageRoutes);
 app.use("/api/news", newsRoutes);
 app.use("/api/upload", authenticateToken, uploadRoutes);
+app.use("/api/page-content", pageContentRoutes);
+app.use("/api/gallery", galleryRoutes);
 
 // ⭐ ЭНДПОИНТ ДЛЯ РУЧНОГО ЗАПУСКА ТЕСТОВЫХ ДАННЫХ
 app.post("/api/seed-test", async (req, res) => {

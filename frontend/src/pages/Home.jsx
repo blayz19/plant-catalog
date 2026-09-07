@@ -161,7 +161,26 @@ export default function Home() {
         )}
       </div>
 
-      {/* Блок популярных товаров */}
+      {/* ========== БАННЕР "ДЛЯ БИЗНЕСА" ========== */}
+      <Link 
+        to="/business" 
+        className="block relative mb-16 rounded-2xl overflow-hidden shadow-xl group"
+      >
+        <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-12 text-center">
+          <div className="absolute inset-0 bg-white/5"></div>
+          <h3 className="text-3xl md:text-4xl font-bold text-white mb-3 relative z-10">
+            🌱 Для бизнеса
+          </h3>
+          <p className="text-white/90 text-lg mb-4 relative z-10">
+            Оптовые поставки, сотрудничество и партнерство
+          </p>
+          <span className="inline-block px-8 py-3 bg-white text-blue-600 rounded-full font-semibold hover:shadow-xl transition relative z-10">
+            Подробнее →
+          </span>
+        </div>
+      </Link>
+
+      {/* ========== БЛОК ПОПУЛЯРНЫХ ТОВАРОВ ========== */}
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}

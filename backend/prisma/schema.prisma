@@ -137,3 +137,29 @@ model ActivityLog {
   
   @@map("activity_logs")
 }
+
+model PageContent {
+  id          Int       @id @default(autoincrement())
+  pageKey     String    @unique @map("page_key")  // например: "about_collection", "useful_planting"
+  title       String                             // Заголовок страницы
+  content     String    @db.Text                 // Основной текст (HTML)
+  image       String?                            // URL картинки (опционально)
+  metaTitle   String?   @map("meta_title")      // SEO заголовок
+  metaDesc    String?   @map("meta_desc")       // SEO описание
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  
+  @@map("page_contents")
+}
+
+model Gallery {
+  id          Int       @id @default(autoincrement())
+  year        Int                                 // Год, например 2024
+  title       String                              // Название фото
+  imageUrl    String    @map("image_url")         // Путь к фото
+  description String?                             // Описание (опционально)
+  sortOrder   Int       @default(0) @map("sort_order")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  
+  @@map("gallery")
+}

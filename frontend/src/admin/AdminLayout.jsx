@@ -25,6 +25,8 @@ export default function AdminLayout() {
               <Link to="/admin/products" className="hover:text-gray-300">Товары</Link>
               <Link to="/admin/banners" className="hover:text-gray-300">Баннеры</Link>
               <Link to="/admin/pages" className="hover:text-gray-300">Страницы</Link>
+              <Link to="/admin/page-content" className="hover:text-gray-300">Контент страниц</Link>
+              <Link to="/admin/gallery" className="hover:text-gray-300">Галерея</Link>
             </div>
             <button onClick={handleLogout} className="bg-red-500 px-4 py-2 rounded hover:bg-red-600">
               Выйти
