@@ -84,6 +84,7 @@ async function seedAdmin() {
 
 // 2. Создание категорий
 // ⭐ ЗАПУСКАЕМ SEED-TEST.CJS ЧЕРЕЗ NODE
+// ⭐ ЗАПУСК SEED-TEST.CJS
 async function runSeedTest() {
   try {
     console.log("🌱 Запускаем seed-test.cjs...");
@@ -108,21 +109,21 @@ async function initDB() {
     if (stderr) console.log("⚠️", stderr);
     console.log("✅ Таблицы созданы/обновлены");
 
-    // Проверяем, есть ли корневая категория
-    const existingRoot = await prisma.category.findFirst({
-      where: { nameRu: "Кедровые сосны", parentId: null },
-    });
+    // Создаём админа
+    await seedAdmin();
 
-    if (!existingRoot) {
-      console.log("📂 Категорий нет, запускаем seed-test.cjs...");
+    // ⭐ ВСЕГДА ЗАПУСКАЕМ SEED-TEST (он сам проверит, что создавать)
+    console.log("📂 Проверяем категории...");
+    const count = await prisma.category.count();
+    console.log(`📊 В базе ${count} категорий`);
+
+    // Если категорий меньше 30 — запускаем seed-test
+    if (count < 30) {
+      console.log("⚠️ Категорий мало, запускаем seed-test.cjs...");
       await runSeedTest();
     } else {
-      const count = await prisma.category.count();
-      console.log(`✅ Категории уже есть (${count} шт.)`);
+      console.log("✅ Категории уже созданы");
     }
-
-    // Создаём админа (если нет)
-    await seedAdmin();
   } catch (error) {
     console.error("❌ Ошибка инициализации БД:", error.message);
   }
