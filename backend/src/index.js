@@ -86,9 +86,15 @@ async function seedAdmin() {
 async function seedCategories() {
   try {
     // Проверяем, есть ли уже категории
-    const count = await prisma.category.count();
-    if (count > 0) {
-      console.log(`✅ Категории уже есть (${count} шт.)`);
+    try {
+    // Проверяем, есть ли корневая категория "Кедровые сосны"
+    const existingRoot = await prisma.category.findFirst({
+      where: { nameRu: "Кедровые сосны", parentId: null }
+    });
+
+    if (existingRoot) {
+      const count = await prisma.category.count();
+      console.log(`✅ Категории уже созданы (${count} шт.)`);
       return;
     }
 
